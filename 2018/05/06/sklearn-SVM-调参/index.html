@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>sklearn SVM 调参 | Hexo</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Hexo">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//blog.ghost.org/content/images/2013/Nov/bloglogo_1-1.png" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">Hexo</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-05-06T14:02:19.000Z" itemprop="datePublished">
+          2018-05-06
+      </time>
+    
+</span>
+    <h1 class="post-title">sklearn SVM 调参</h1>
+    <section class="post-content">
+      <h2 id="sklearn中SVM调参说明以及总结，对于各类博客的总结与实践"><a href="#sklearn中SVM调参说明以及总结，对于各类博客的总结与实践" class="headerlink" title="sklearn中SVM调参说明以及总结，对于各类博客的总结与实践"></a>sklearn中SVM调参说明以及总结，对于各类博客的总结与实践</h2><h3 id="svm调参策略"><a href="#svm调参策略" class="headerlink" title="svm调参策略"></a>svm调参策略</h3><ol>
+<li>对数据归一化</li>
+<li>应用rbf核函数</li>
+<li>用cross-validation和grid-search得到最优的c,g</li>
+<li>用得到的最优cg训练测试</li>
+</ol>
+<h3 id="常用核函数"><a href="#常用核函数" class="headerlink" title="常用核函数"></a>常用核函数</h3><ol>
+<li>linear核函数</li>
+<li>polynomial核函数</li>
+<li>RBF核函数</li>
+<li>sigmoid核函数</li>
+</ol>
+<h3 id="核函数对应的参数"><a href="#核函数对应的参数" class="headerlink" title="核函数对应的参数"></a>核函数对应的参数</h3><ol>
+<li>对于线性核函数，没有专门需要设置的参数</li>
+<li>对于多项式核函数，三个参数<br> a. -d 设置多项式核函数的最高次项次数，公式中的d，默认值3<br> b. -g 设置核函数中的grmma参数设置，默认是1/k(k是特征数)。<br> c. -r 设置核函数的coef0，公式中的b，默认是0.</li>
+<li>对于RBF核函数，一个参数， -g设置核函数gamma参数值，默认是1/k(k是特征数)</li>
+<li>对于sigmoid核函数两个参数<br> a. -g 设置核函数中的grmma参数设置，默认是1/k(k是特征数)。<br> b. -r 设置核函数的coef0，公式中的b，默认是0.</li>
+</ol>
+<h4 id="RBF核函数的惩罚系数C和gamma"><a href="#RBF核函数的惩罚系数C和gamma" class="headerlink" title="RBF核函数的惩罚系数C和gamma:"></a>RBF核函数的惩罚系数C和gamma:</h4><p>SVM模型有两个非常重要的参数C与gamma。其中 C是惩罚系数，即对误差的宽容度。c越高，说明越不能容忍出现误差,容易过拟合。C越小，容易欠拟合。C过大或过小，泛化能力变差</p>
+<p>gamma是选择RBF函数作为kernel后，该函数自带的一个参数。隐含地决定了数据映射到新的特征空间后的分布，gamma越大，支持向量越少，gamma值越小，支持向量越多。支持向量的个数影响训练与预测的速度。</p>
+<p>这里面大家需要注意的就是gamma的物理意义，大家提到很多的RBF的幅宽，它会影响每个支持向量对应的高斯的作用范围，从而影响泛化性能。我的理解：如果gamma设的太大，方差会很小，方差很小的高斯分布长得又高又瘦， 会造成只会作用于支持向量样本附近，对于未知样本分类效果很差，存在训练准确率可以很高，(如果让方差无穷小，则理论上，高斯核的SVM可以拟合任何非线性数据，但容易过拟合)而测试准确率不高的可能，就是通常说的过训练；而如果设的过小，则会造成平滑效应太大，无法在训练集上得到特别高的准确率，也会影响测试集的准确率。</p>
+<p>此外，可以明确的两个结论是：<br>结论1：样本数目少于特征维度并不一定会导致过拟合，这可以参考余凯老师的这句评论：<br>“这不是原因啊，呵呵。用RBF kernel, 系统的dimension实际上不超过样本数，与特征维数没有一个trivial的关系。”</p>
+<p>结论2：RBF核应该可以得到与线性核相近的效果（按照理论，RBF核可以模拟线性核），可能好于线性核，也可能差于，但是，不应该相差太多。<br>当然，很多问题中，比如维度过高，或者样本海量的情况下，大家更倾向于用线性核，因为效果相当，但是在速度和模型大小方面，线性核会有更好的表现。</p>
+<h3 id="sklearn-svc-中-svm参数设置"><a href="#sklearn-svc-中-svm参数设置" class="headerlink" title="sklearn.svc 中 svm参数设置"></a>sklearn.svc 中 svm参数设置</h3><ol>
+<li>C:float 参数，默认为1.0。错误项的惩罚系数。C越大，即对分错样本的惩罚程度越大，因此在训练样本中准确率越高，但是泛化能力降低，也就是对测试数据的分类准确率降低。相反，减小C的话，容许训练样本中有一些误分类错误样本，泛化能力强。对于训练样本带有噪声的情况，一般采用后者，把训练样本集中错误分类的样本作为噪声。c 一般选取0.0001到10000.</li>
+<li>kernel:str参数，默认为’rbf’,一般可以选’linear’,’poly’,’rbf’,’sigmod’</li>
+<li>degree: int参数，默认3</li>
+<li>gamma:float参数，默认auto，即为特征值倒数</li>
+<li>coef0:float参数，默认0.0</li>
+<li>verbose: bool参数，默认false。是否启用详细输出。 此设置利用libsvm中的每个进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。一般情况都设为False，不用管它。</li>
+</ol>
+<h4 id="主要方法和属性"><a href="#主要方法和属性" class="headerlink" title="主要方法和属性"></a>主要方法和属性</h4><ol>
+<li>fit()用于训练SVM，具体参数已经在定义SVC对象的时候给出了，这时候只需要给出数据集X和X对应的标签y即可。</li>
+<li>predict() 方法: 基于以上的训练，对预测样本T进行类别预测，因此只需要接收一个测试集T，该函数返回一个数组表示个测试样本的类别。</li>
+<li>属性：<br> a. svc.n_support_：各类各有多少个支持向量<br> b. svc.support_：各类的支持向量在训练样本中的索引<br> c.svc.support_vectors_：各类所有的支持向量</li>
+</ol>
+<h3 id="使用grid-search"><a href="#使用grid-search" class="headerlink" title="使用grid search"></a>使用grid search</h3><p>使用grid Search比较简单，有两个优点：可以得到全局最优，c和gamma相互独立，便于并行化进行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.grid_search import GridSearchCV</span><br><span class="line">from sklearn.svm import SVC</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos;)</span><br><span class="line">param_grid=&#123;&apos;C&apos;:[1e-3,1e-2,1e-1,1,10,100,1000],&apos;gamma&apos;:[0.001,0.0001]&#125;</span><br><span class="line">grid_search=GridSearchCV(model,param_grid,n_jobs=8,verbose=1)</span><br><span class="line">grid_search.fit(train_x,train_y)</span><br><span class="line">best_parameters=grid_search.best_estimator_.get_params()</span><br><span class="line">for para,val in list(best_parameters.items()):</span><br><span class="line">    print(para,val)</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos; ,C=best_parameters[&apos;C&apos;],gamma=best_parameters[&apos;gamma&apos;])</span><br><span class="line">model.fit(train_x,train_y)</span><br></pre></td></tr></table></figure></p>
+<h3 id="SVM-特点："><a href="#SVM-特点：" class="headerlink" title="SVM 特点："></a>SVM 特点：</h3><ol>
+<li></li>
+</ol>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>John Doe</h4>
+    <p>A designer, developer and entrepreneur. Spends his time travelling the world with a bag of kites. Likes journalism and publishing platforms.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://yoursite.com/2018/05/06/sklearn-SVM-调参/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/05/06/sklearn-SVM-调参/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://yoursite.com/2018/05/06/sklearn-SVM-调参/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2018/05/03/first/">
+        first →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Hexo</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
