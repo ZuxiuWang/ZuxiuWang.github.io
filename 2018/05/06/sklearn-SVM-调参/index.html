@@ -82,10 +82,22 @@
 <li>predict() 方法: 基于以上的训练，对预测样本T进行类别预测，因此只需要接收一个测试集T，该函数返回一个数组表示个测试样本的类别。</li>
 <li>属性：<br> a. svc.n_support_：各类各有多少个支持向量<br> b. svc.support_：各类的支持向量在训练样本中的索引<br> c.svc.support_vectors_：各类所有的支持向量</li>
 </ol>
-<h3 id="使用grid-search"><a href="#使用grid-search" class="headerlink" title="使用grid search"></a>使用grid search</h3><p>使用grid Search比较简单，有两个优点：可以得到全局最优，c和gamma相互独立，便于并行化进行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.grid_search import GridSearchCV</span><br><span class="line">from sklearn.svm import SVC</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos;)</span><br><span class="line">param_grid=&#123;&apos;C&apos;:[1e-3,1e-2,1e-1,1,10,100,1000],&apos;gamma&apos;:[0.001,0.0001]&#125;</span><br><span class="line">grid_search=GridSearchCV(model,param_grid,n_jobs=8,verbose=1)</span><br><span class="line">grid_search.fit(train_x,train_y)</span><br><span class="line">best_parameters=grid_search.best_estimator_.get_params()</span><br><span class="line">for para,val in list(best_parameters.items()):</span><br><span class="line">    print(para,val)</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos; ,C=best_parameters[&apos;C&apos;],gamma=best_parameters[&apos;gamma&apos;])</span><br><span class="line">model.fit(train_x,train_y)</span><br></pre></td></tr></table></figure></p>
-<h3 id="SVM-特点："><a href="#SVM-特点：" class="headerlink" title="SVM 特点："></a>SVM 特点：</h3><ol>
-<li></li>
+<h3 id="使用grid-search"><a href="#使用grid-search" class="headerlink" title="使用grid search"></a>使用grid search</h3><p>使用grid Search比较简单，有两个优点：可以得到全局最优，c和gamma相互独立，便于并行化进行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from sklearn.grid_search import GridSearchCV</span><br><span class="line">from sklearn.svm import SVC</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos;)</span><br><span class="line">param_grid=&#123;&apos;C&apos;:[1e-3,1e-2,1e-1,1,10,100,1000],&apos;gamma&apos;:[0.001,0.0001]&#125;</span><br><span class="line">grid_search=GridSearchCV(model,param_grid,n_jobs=8,verbose=1)</span><br><span class="line">grid_search.fit(train_x,train_y)</span><br><span class="line">best_parameters=grid_search.best_estimator_.get_params()</span><br><span class="line">print(&quot;best parameters are&quot; % grid_search.best_params_,grid.best_score_)</span><br><span class="line">for para,val in list(best_parameters.items()):</span><br><span class="line">    print(para,val)</span><br><span class="line">model=SVC(kernel=&apos;rbf&apos; ,C=best_parameters[&apos;C&apos;],gamma=best_parameters[&apos;gamma&apos;])</span><br><span class="line">model.fit(train_x,train_y)</span><br></pre></td></tr></table></figure></p>
+<p>对于SVM的RBF核，我们主要调参方法是交叉验证，在sklearn中，主要是使用GridSearchCV当然也可以使用cross_val_score调参，但是个人觉得没有GridSearchCV方便</p>
+<h4 id="要注意的参数有"><a href="#要注意的参数有" class="headerlink" title="要注意的参数有"></a>要注意的参数有</h4><ol>
+<li>estimator:我们的模型，即为带高斯核的SVC和SVR</li>
+<li>param_grid:我们要调参数的列表， 比如我们用SVC分类模型的话，那么param_grid可以定义为{“C”:[0.1, 1, 10], “gamma”: [0.1, 0.2, 0.3]}，这样我们就会有9种超参数的组合来进行网格搜索，选择一个拟合分数最好的超平面系数。</li>
+<li>cv,交叉验证的折数，将训练集分成多少份来进行交叉验证，默认是3，如果样本数多可适当增加。<br>网格搜索结束后，我们可以得到最好的模型estimator,param_grid中最好的参数组合，最好的模型分数。</li>
 </ol>
+<h3 id="SVM-特点："><a href="#SVM-特点：" class="headerlink" title="SVM 特点："></a>SVM 特点：</h3><ol>
+<li>非线性映射是SVM方法的理论基础,SVM利用内积核函数代替向高维空间的非线性映射；</li>
+<li>对特征空间划分的最优超平面是SVM的目标,最大化分类边际的思想是SVM方法的核心；</li>
+<li>支持向量是SVM的训练结果,在SVM分类决策中起决定作用的是支持向量；</li>
+<li>SVM 的最终决策函数只由少数的支持向量所确定,计算的复杂性取决于支持向量的数目,而不是样本空间的维数,这在某种意义上避免了“维数灾难”。</li>
+<li>少数支持向量决定了最终结果,这不但可以帮助我们抓住关键样本、“剔除”大量冗余样本,而且注定了该方法不但算法简单,而且具有较好的“鲁棒”性。这种“鲁棒”性主要体现在:<br>①增、删非支持向量样本对模型没有影响;<br>②支持向量样本集具有一定的鲁棒性;<br>③有些成功的应用中,SVM 方法对核的选取不敏感</li>
+</ol>
+<h3 id="SVM缺点"><a href="#SVM缺点" class="headerlink" title="SVM缺点"></a>SVM缺点</h3><p>(1) SVM算法对大规模训练样本难以实施<br>由于SVM是借助二次规划来求解支持向量，而求解二次规划将涉及m阶矩阵的计算（m为样本的个数），当m数目很大时该矩阵的存储和计算将耗费大量的机器内存和运算时间。针对以上问题的主要改进有<br>J.Platt的SMO算法、<br>T.Joachims的SVM、<br>C.J.C.Burges等的PCGC、<br>张学工的CSVM<br>以及O.L.Mangasarian等的SOR算法</p>
+<p>(2) 用SVM解决多分类问题存在困难<br>经典的支持向量机算法只给出了二类分类的算法，而在数据挖掘的实际应用中，一般要解决多类的分类问题。可以通过多个二类支持向量机的组合来解决。主要有一对多组合模式、一对一组合模式和SVM决策树；再就是通过构造多个分类器的组合来解决。主要原理是克服SVM固有的缺点，结合其他算法的优势，解决多类问题的分类精度。如：与粗集理论结合，形成一种优势互补的多类问题的组合分类器.</p>
 
     </section>
     <footer class="post-footer">
