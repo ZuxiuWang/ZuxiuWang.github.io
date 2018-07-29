@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>leetcode代码日记 | Hexo</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+  <meta name="generator" content="Hexo">
+
+  
+  
+  
+
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="site-head"  style="background-image: url(//blog.ghost.org/content/images/2013/Nov/cover.png)" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="//blog.ghost.org/content/images/2013/Nov/bloglogo_1-1.png" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">Hexo</h1>
+            <h2 class="blog-description"></h2>
+        </div>
+    </div>
+</header>
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2018-07-29T08:48:22.000Z" itemprop="datePublished">
+          2018-07-29
+      </time>
+    
+</span>
+    <h1 class="post-title">leetcode代码日记</h1>
+    <section class="post-content">
+      <h2 id="leetcode-代码日记"><a href="#leetcode-代码日记" class="headerlink" title="leetcode 代码日记"></a>leetcode 代码日记</h2><h3 id="1-two-sum"><a href="#1-two-sum" class="headerlink" title="1.two sum"></a>1.two sum</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">class Solution(object):</span><br><span class="line">def twoSum(self, num, target):</span><br><span class="line">sortnum=sorted(num)</span><br><span class="line">i=0</span><br><span class="line">j=len(sortnum)-1</span><br><span class="line">while sortnum[i]+sortnum[j] != target and i!=j:</span><br><span class="line">if sortnum[i]+sortnum[j] &gt; target:</span><br><span class="line">j=j-1</span><br><span class="line">if sortnum[i]+sortnum[j] &lt; target:</span><br><span class="line">i=i+1</span><br><span class="line">if sortnum[i]+sortnum[j]==target and i!=j:</span><br><span class="line">m=num.index(sortnum[i])</span><br><span class="line">n=num.index(sortnum[j])</span><br><span class="line">if m==n:</span><br><span class="line">n=num.index(sortnum[j],m+1)</span><br><span class="line">if m&gt;n:</span><br><span class="line">temp=m</span><br><span class="line">m=n</span><br><span class="line">n=temp</span><br><span class="line">return m,n</span><br></pre></td></tr></table></figure>
+<p>万事开头难，第一题，两数求和，二分法。首先将数组进行排序，第一个索引的数加上最后一个索引的数，如果大于target，最后一个索引减1，如果小于target，索引i+1。m和n是找到对应解的原数组位置，如果m和n一样大说明数组类似于[3,3],index函数只会找到第一个等于目标值的索引，所以要把起始位置从m+1开始找。</p>
+<h3 id="64-minimum-path-sum"><a href="#64-minimum-path-sum" class="headerlink" title="64.minimum path sum"></a>64.minimum path sum</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class Solution(object):</span><br><span class="line">def minPathSum(grid):</span><br><span class="line">m=len(grid[0])</span><br><span class="line">n=len(grid)</span><br><span class="line"></span><br><span class="line">result=[[ 0 for col in range(m) ] for row in range(n)]</span><br><span class="line">result[0][0]=grid[0][0]</span><br><span class="line">for i in range(1,m):</span><br><span class="line">result[0][i]=grid[0][i]+result[0][i-1]</span><br><span class="line"># print result[0][i]</span><br><span class="line">for j in range(1,n):</span><br><span class="line">result[j][0]=grid[j][0]+result[j-1][0]</span><br><span class="line">print result[j][0]</span><br><span class="line">print result</span><br><span class="line">for i in range(1,n):</span><br><span class="line">for j in range(1,m):</span><br><span class="line">if(result[i][j-1]&gt;result[i-1][j]):</span><br><span class="line">result[i][j]= result[i-1][j]+grid[i][j]</span><br><span class="line"># print result[i][j]</span><br><span class="line">else:</span><br><span class="line">result[i][j]= result[i][j-1]+grid[i][j]</span><br><span class="line">print result[i][j]</span><br><span class="line"></span><br><span class="line">print result</span><br><span class="line">return result[n-1][m-1]</span><br></pre></td></tr></table></figure>
+<p>该题思路：从左上角到右下角找寻最短路径，首先初始化第一行，第一列，新建一个数组用于保存结果，第一行第一列到值等于左边值加本身或者上面值加本身，数组中间的值等于左边和上面的小的值。</p>
+<h3 id="771-Jewels-and-Stones"><a href="#771-Jewels-and-Stones" class="headerlink" title="771.Jewels and Stones"></a>771.Jewels and Stones</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">def numJewels(J,S):</span><br><span class="line">sum=0</span><br><span class="line">J=set(J)</span><br><span class="line">for s in S:</span><br><span class="line">if s in J:</span><br><span class="line">sum+=1</span><br><span class="line">return sum</span><br><span class="line">def num(J,S):</span><br><span class="line">hashtable=[0 for x in range(256)]</span><br><span class="line">sum=0</span><br><span class="line">for i,data in enumerate(J):</span><br><span class="line">hashtable[ord(data)]=1</span><br><span class="line">for j,data in enumerate(S):</span><br><span class="line">if hashtable[ord(data)]==1:</span><br><span class="line">sum+=1</span><br><span class="line">print sum</span><br><span class="line"></span><br><span class="line">def numJewel(J,S):</span><br><span class="line">s=sum([x in J for x in S])</span><br><span class="line">print s</span><br></pre></td></tr></table></figure>
+<p>一道简单题，双重遍历时间复杂度O(n2)，或者使用hash，记录值时间复杂度O(n)</p>
+<h3 id="33-Search-in-Rotated-Sorted-Array"><a href="#33-Search-in-Rotated-Sorted-Array" class="headerlink" title="33.Search in Rotated Sorted Array"></a>33.Search in Rotated Sorted Array</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">class Solution(object):</span><br><span class="line">def search(self, nums, target):</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">:type nums: List[int]</span><br><span class="line">:type target: int</span><br><span class="line">:rtype: int</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">low=0</span><br><span class="line">high=len(nums)-1</span><br><span class="line">while low&lt;=high:</span><br><span class="line">mid=(low+high)/2</span><br><span class="line">if nums[mid]==target:</span><br><span class="line">return mid </span><br><span class="line">if nums[mid]&lt;nums[high]: </span><br><span class="line">if nums[mid]&lt;=target and target&lt;=nums[high]:</span><br><span class="line">low=mid+1</span><br><span class="line">else :</span><br><span class="line">high=mid-1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">else:</span><br><span class="line">if nums[mid]&gt;target and target&gt;=nums[low]:</span><br><span class="line">high=mid-1</span><br><span class="line">else:</span><br><span class="line">low=mid+1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">return -1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">nums=[4,5,6,7,0,1,2]</span><br><span class="line">s=Solution()</span><br><span class="line">r=s.search(nums,0)</span><br><span class="line">print r</span><br></pre></td></tr></table></figure>
+<p>该题临界值是关键，旋转数组，不知道临界值在什么位置，但是临界值左边是有序的，临界值右边也是有序的。该题采用二分的思想，如果中间值小于最高位，说明右边是有序的，临界值在左边，如果target大于middle，low=mid+1，如果target小于middle，high=mid-1，同理可得到临界值在右边的情况。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>John Doe</h4>
+    <p>A designer, developer and entrepreneur. Spends his time travelling the world with a bag of kites. Likes journalism and publishing platforms.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://yoursite.com/2018/07/29/leetcode代码日记/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/2018/07/29/leetcode代码日记/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://yoursite.com/2018/07/29/leetcode代码日记/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2018/05/06/sklearn-SVM-调参/">
+        sklearn SVM 调参 →
+    </a>
+    
+</nav>
+  <div id="comment" class="comments-area">
+    <h1 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h1>
+
+    
+</div>
+</main>
+
+
+  
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">Hexo</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+
+
+</body>
+</html>
